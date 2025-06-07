@@ -1,6 +1,9 @@
 from django.db import models
 
-class Sitio(models.Model):
+# Create your models here.
+from django.db import models
+
+class SitioTuristico(models.Model):
     nombre = models.CharField(max_length=100)
     descripcion = models.TextField()
     latitud = models.FloatField()

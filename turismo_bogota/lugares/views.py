@@ -18,12 +18,8 @@ def lista_sitios(request):
     ]
     return JsonResponse({"sitios": data})
 
-
-
-from django.conf import settings  # Importar settings
-
-from django.conf import settings
 import requests
+from django.conf import settings
 from django.http import JsonResponse
 
 
@@ -33,29 +29,46 @@ def paradas_cercanas(request):
     radius = request.GET.get("radius", "1000")
 
     if not lat or not lon:
-        return JsonResponse({"error": "Faltan coordenadas"}, status=400)
+        return JsonResponse({"error": "Faltan coordenadas (lat y lon)"}, status=400)
 
     api_key = settings.TRANSITLAND_API_KEY
+    url = (
+        f"https://transit.land/api/v2/rest/stops"
+        f"?lat={lat}&lon={lon}&radius={radius}&api_key={api_key}"
+    )
 
-    headers = {
-        "Authorization": f"Bearer {api_key}"
-    }
-
-    url = f"https://transit.land/api/v2/rest/stops?lat={lat}&lon={lon}&r={radius}"
     print("🔗 URL de la API:", url)
-    print("🔐 Encabezados:", headers)
 
-    response = requests.get(url, headers=headers)
-    data = response.json()
+    try:
+        response = requests.get(url, timeout=10)
+        print("🌐 Código de estado:", response.status_code)
 
-    print("📦 Respuesta de Transitland:", data)  # <-- MUY IMPORTANTE
+        if response.status_code != 200:
+            return JsonResponse({
+                "error": f"Error desde Transitland (código {response.status_code})"
+            }, status=response.status_code)
 
-    paradas = [
+        data = response.json()
+        print("📦 Respuesta de Transitland:", data)
+
+        paradas = [
         {
-            "nombre": parada.get("name"),
+            "nombre": parada.get("name") or "Parada sin nombre",
             "id": parada.get("onestop_id"),
             "coordenadas": parada.get("geometry", {}).get("coordinates"),
         }
         for parada in data.get("stops", [])
-    ]
-    return JsonResponse({"paradas": paradas})
+]
+
+        return JsonResponse({"paradas": paradas})
+
+    except requests.exceptions.RequestException as e:
+        print("❌ Error de red:", e)
+        return JsonResponse({"error": "No se pudo conectar con Transitland"}, status=503)
+    
+from django.shortcuts import render
+
+def vista_mapa(request):
+    return render(request, "lugares/mapa.html")
+
+

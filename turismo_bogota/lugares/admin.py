@@ -1,5 +1,6 @@
-
 from django.contrib import admin
-from .models import SitioTuristico
+from .models import Sitio
 
-admin.site.register(SitioTuristico)
+@admin.register(Sitio)
+class SitioAdmin(admin.ModelAdmin):
+    list_display = ('nombre', 'latitud', 'longitud')
