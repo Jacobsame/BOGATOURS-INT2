@@ -1,11 +1,11 @@
 import requests
 from django.http import JsonResponse
-from .models import SitioTuristico
+from .models import Sitio
 
 
 
 def lista_sitios(request):
-    sitios = SitioTuristico.objects.all()
+    sitios = Sitio.objects.all()
     data = [
         {
             "id": sitio.id,

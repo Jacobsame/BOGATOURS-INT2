@@ -69,6 +69,7 @@ TEMPLATES = [
     },
 ]
 
+STATIC_URL = '/static/'
 WSGI_APPLICATION = 'turismo_bogota.wsgi.application'
 
 
@@ -125,4 +126,7 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-TRANSITLAND_API_KEY = config('TRANSITLAND_API_KEY')
+import os
+
+TRANSITLAND_API_KEY = os.getenv("TRANSITLAND_API_KEY")
+
