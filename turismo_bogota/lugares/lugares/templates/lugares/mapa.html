@@ -1,70 +1,23 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8" />
-    <title>Mapa de Paradas Cercanas</title>
-    <link
-      rel="stylesheet"
-      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-      integrity="sha256-sA+eCHCpXIBjs+aeNPLvN0TkT3qHgRk5F5RTbt7Xk0k="
-      crossorigin=""
-    />
-    <style>
-      #map {
-        height: 500px;
-        width: 100%;
-      }
-    </style>
+  <meta charset="UTF-8">
+  <title>Mapa Turístico</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <style>
+    #map { height: 100vh; }
+  </style>
 </head>
 <body>
-    <h1>Paradas Cercanas</h1>
-    <div id="map"></div>
+  <h1 style="text-align: center;">Paradas de Transporte Público en Bogotá</h1>
+  <div id="map"></div>
 
-    <script
-      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-      integrity="sha256-o+RrPQbzpCy4LgE6u+duRmPzABpZx5fALvxf0PR6XkM="
-      crossorigin=""
-    ></script>
-    <script>
-      // Coordenadas iniciales (Bogotá)
-      const lat = 4.6482837;
-      const lon = -74.2478934;
-      const radius = 1000;
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
-      // Crear mapa centrado en Bogotá
-      const map = L.map('map').setView([lat, lon], 14);
-
-      // Capa base (OpenStreetMap)
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          attribution: '© OpenStreetMap contributors',
-      }).addTo(map);
-
-      // Función para obtener paradas desde la API
-      async function cargarParadas() {
-        try {
-          const response = await fetch(`/api/paradas-cercanas/?lat=${lat}&lon=${lon}&radius=${radius}`);
-          const data = await response.json();
-
-          if(data.error) {
-            alert('Error: ' + data.error);
-            return;
-          }
-
-          data.paradas.forEach(parada => {
-            const coords = parada.coordenadas;
-            if (coords && coords.length === 2) {
-              const marker = L.marker([coords[1], coords[0]]).addTo(map);
-              marker.bindPopup(`<b>${parada.nombre}</b><br>ID: ${parada.id}`).openPopup();
-            }
-          });
-        } catch (error) {
-          alert('Error al cargar las paradas.');
-          console.error(error);
-        }
-      }
-
-      // Cargar las paradas al iniciar
-      cargarParadas();
-    </script>
+  <!-- Tu JavaScript -->
+  <script src="{% static 'lugares/js/mapa.js' %}"></script>
 </body>
 </html>

@@ -1,7 +1,7 @@
 import requests
 from django.http import JsonResponse
 from .models import Sitio
-
+from django.shortcuts import render
 
 
 def lista_sitios(request):
@@ -68,7 +68,13 @@ def paradas_cercanas(request):
     
 from django.shortcuts import render
 
+
+
 def vista_mapa(request):
-    return render(request, "lugares/mapa.html")
+    return render(request, 'lugares/mapa.html')
+
+
+def inicio(request):
+    return render(request, "lugares/index.html")
 
 
