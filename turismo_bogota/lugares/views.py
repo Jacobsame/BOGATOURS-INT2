@@ -68,6 +68,46 @@ def paradas_cercanas(request):
     
 from django.shortcuts import render
 
+import requests
+from django.conf import settings
+from django.http import JsonResponse
+from .models import ParadaTransporte
+
+def importar_paradas(request):
+    lat = request.GET.get("lat")
+    lon = request.GET.get("lon")
+    radius = request.GET.get("radius", 1500)
+
+    if not lat or not lon:
+        return JsonResponse({"error": "Faltan coordenadas"}, status=400)
+
+    headers = {
+        "Authorization": f"Bearer {settings.TRANSITLAND_API_KEY}"
+    }
+
+    url = f"https://transit.land/api/v2/rest/stops?lat={lat}&lon={lon}&r={radius}"
+    response = requests.get(url, headers=headers)
+    data = response.json()
+
+    nuevas = 0
+    for parada in data.get("stops", []):
+        nombre = parada.get("name") or ""
+        onestop_id = parada.get("onestop_id")
+        coords = parada.get("geometry", {}).get("coordinates")
+
+        if onestop_id and coords:
+            _, created = ParadaTransporte.objects.get_or_create(
+                onestop_id=onestop_id,
+                defaults={
+                    "nombre": nombre,
+                    "latitud": coords[1],
+                    "longitud": coords[0],
+                }
+            )
+            if created:
+                nuevas += 1
+
+    return JsonResponse({"mensaje": f"✅ {nuevas} paradas nuevas guardadas."})
 
 
 def vista_mapa(request):

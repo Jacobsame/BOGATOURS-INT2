@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -9,11 +10,23 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
+  <!-- Leaflet Routing Machine -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
+  <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
+
   <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+    }
+    header {
+      background: #2c3e50;
+      color: white;
+      padding: 10px;
+      text-align: center;
+    }
     #bogota-map {
-      height: 500px;
-      border-radius: 10px;
-      margin-top: 30px;
+      height: 600px;
     }
     .leaflet-control-attribution {
       display: none !important;
@@ -23,84 +36,84 @@
 <body>
 
   <header>
-    <div class="container header-content">
-      <div class="logo">
-        <h1>bogaTours</h1>
-        <img src="6ba2304d-0894-4c71-9bb7-f61748787a7b.jpg" alt="" style="width: 100px; height: auto;">
-      </div>
-      <nav>
-        <ul>
-          <li><a href="/">Inicio</a></li>
-          <li><a href="#tours">Nuestros Tours</a></li>
-          <li><a href="#mapa">Mapa Interactivo</a></li>
-          <li><a href="#about">Acerca de Nosotros</a></li>
-          <li><a href="#blog">Blog</a></li>
-          <li><a href="#contact">Contacto</a></li>
-        </ul>
-      </nav>
-      <button class="btn-reserve">¡Reserva tu Aventura!</button>
-    </div>
+    <h1>bogaTours</h1>
+    <p>Explora sitios turísticos de Bogotá con transporte público</p>
   </header>
 
   <main>
-    <section id="mapa" class="section-padding">
-      <div class="container">
-        <h2>Mapa Interactivo de Bogotá</h2>
-        <p>Descubre las zonas turísticas y las paradas de transporte cercanas.</p>
-        <div id="bogota-map"></div>
-      </div>
-    </section>
+    <div id="bogota-map"></div>
   </main>
-
-  <footer>
-    <div class="container footer-content">
-      <div class="contact-info">
-        <h3>Contacto</h3>
-        <p>Teléfono: +57 3053128525</p>
-        <p>Email: info@bogotours.com</p>
-      </div>
-      <div class="social-media">
-        <h3>Síguenos</h3>
-        <a href="#"><img src="descarga.png" alt="Facebook"></a>
-        <a href="#"><img src="descarga.jpg" alt="Instagram"></a>
-      </div>
-    </div>
-    <div class="copyright">
-      <p>&copy; 2025 bogoTours. Todos los derechos reservados.</p>
-    </div>
-  </footer>
 
   <script>
     const map = L.map('bogota-map').setView([4.711, -74.0721], 13);
 
-    // Mapa base
+    // Capa base
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap'
     }).addTo(map);
 
-    // Sitios turísticos (marcadores fijos)
+    // Control de ruta actual
+    let controlRuta = null;
+
+    function mostrarRutaDesdeUbicacion(destinoLat, destinoLng) {
+      if (!navigator.geolocation) {
+        alert("Tu navegador no permite geolocalización.");
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const origen = [position.coords.latitude, position.coords.longitude];
+          const destino = [destinoLat, destinoLng];
+
+          if (controlRuta) {
+            map.removeControl(controlRuta);
+          }
+
+          controlRuta = L.Routing.control({
+            waypoints: [
+              L.latLng(origen[0], origen[1]),
+              L.latLng(destino[0], destino[1])
+            ],
+            routeWhileDragging: false,
+            show: false,
+            createMarker: () => null
+          }).addTo(map);
+
+          map.setView(origen, 14);
+        },
+        (error) => {
+          console.error("Error de geolocalización:", error);
+          alert("No se pudo obtener tu ubicación.");
+        }
+      );
+    }
+
+    // Sitios turísticos
     const zonasTuristicas = [
       { nombre: "La Candelaria", coords: [4.595, -74.074], descripcion: "Centro histórico y cultural." },
       { nombre: "Monserrate", coords: [4.605, -74.055], descripcion: "Mirador icónico de Bogotá." },
       { nombre: "Museo del Oro", coords: [4.601, -74.072], descripcion: "Museo con artefactos precolombinos." },
       { nombre: "Parque Simón Bolívar", coords: [4.658, -74.093], descripcion: "Gran parque urbano." },
-      { nombre: "Zona T", coords: [4.669, -74.052], descripcion: "Área moderna con tiendas y vida nocturna." },
+      { nombre: "Zona T", coords: [4.669, -74.052], descripcion: "Zona moderna y de vida nocturna." },
       { nombre: "Museo Botero", coords: [4.598, -74.071], descripcion: "Obras de Botero y otros artistas." },
-      { nombre: "Plaza de Bolívar", coords: [4.598, -74.074], descripcion: "Catedral Primada, Capitolio Nacional." },
-      { nombre: "Teatro Colón", coords: [4.597, -74.073], descripcion: "Teatro histórico de Bogotá." },
-      { nombre: "Museo Nacional", coords: [4.609, -74.068], descripcion: "Arte, historia y etnografía." },
-      { nombre: "Planetario de Bogotá", coords: [4.609, -74.068], descripcion: "Centro astronómico." },
-      { nombre: "Parque de los Novios", coords: [4.660, -74.084], descripcion: "Lago, paseo y naturaleza." },
-      { nombre: "Maloka", coords: [4.654, -74.106], descripcion: "Ciencia y tecnología interactiva." }
+      { nombre: "Plaza de Bolívar", coords: [4.598, -74.074], descripcion: "Plaza histórica con edificios coloniales." }
     ];
 
     zonasTuristicas.forEach(zona => {
-      L.marker(zona.coords, { icon: L.icon({ iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png' }) })
+      const [lat, lng] = zona.coords;
+      L.marker([lat, lng])
         .addTo(map)
-        .bindPopup(`<strong>${zona.nombre}</strong><br>${zona.descripcion}`);
+        .bindPopup(`
+          <strong>${zona.nombre}</strong><br>
+          ${zona.descripcion}<br><br>
+          <button onclick="mostrarRutaDesdeUbicacion(${lat}, ${lng})">
+            Cómo llegar desde mi ubicación
+          </button>
+        `);
     });
 
-    // Cargar paradas desde API Django
+    // Obtener paradas desde Django y mostrarlas
     async function cargarParadas(lat, lon) {
       const response = await fetch(`/api/paradas-cercanas/?lat=${lat}&lon=${lon}&radius=1500`);
       const data = await response.json();
@@ -110,7 +123,7 @@
         const nombre = parada.nombre || "Parada sin nombre";
 
         L.circleMarker([lat, lng], {
-          radius: 6,
+          radius: 5,
           color: "#ff0000",
           fillColor: "#ff6666",
           fillOpacity: 0.9
@@ -119,9 +132,10 @@
       });
     }
 
-    // Llamar a la función centrado en el centro histórico
-    cargarParadas(4.598, -74.075);
+    // Centro histórico como referencia
+    cargarParadas(4.598, -74.074);
   </script>
+  <script src="{% static 'lugares/js/mapa.js' %}"></script>
 
 </body>
 </html>
