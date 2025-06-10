@@ -101,7 +101,8 @@ python manage.py runserver
 Accede a la aplicación en http://127.0.0.1:8000/.
 
 📂 Estructura del Proyecto
-```
+
+
 /BOGATOURS-INT2
 ├── app/               # Contiene el punto de entrada de la aplicación
 │   ├── main.py        # Archivo principal que ejecuta la lógica central
@@ -138,7 +139,7 @@ Accede a la aplicación en http://127.0.0.1:8000/.
 │   │   └── tests.py     # Pruebas unitarias del módulo
 ├── requirements.txt   # Listado de dependencias necesarias
 └── DOCUMENTACION.md   # Documentación detallada del proyecto
-```
+
 📖 Uso de la Aplicación
 Accede al servidor local: Ingresa a ```http://127.0.0.1:8000/``` en el navegador.
 
