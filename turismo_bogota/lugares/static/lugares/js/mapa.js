@@ -1,50 +1,90 @@
-// Crear el mapa centrado en Bogotá
 const map = L.map("bogota-map").setView([4.711, -74.0721], 13);
 
-// Capa base de OpenStreetMap
-L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-  attribution: "© OpenStreetMap contributors"
+// Estilo de mapa oscuro como TransmiApp
+L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
+  attribution: "&copy; OpenStreetMap & CartoDB",
 }).addTo(map);
 
-// Control de ruta
 let controlRuta = null;
 
-// Función para mostrar la ruta desde la ubicación actual
-function mostrarRutaDesdeUbicacion(destinoLat, destinoLng) {
+// Función que simula la lógica de TransmiApp
+function comoTransmiApp(destinoLat, destinoLng) {
   if (!navigator.geolocation) {
     alert("Tu navegador no soporta geolocalización.");
     return;
   }
 
-  navigator.geolocation.getCurrentPosition(
-    (position) => {
-      const origen = [position.coords.latitude, position.coords.longitude];
-      const destino = [destinoLat, destinoLng];
+  navigator.geolocation.getCurrentPosition(async (position) => {
+    const userLat = position.coords.latitude;
+    const userLon = position.coords.longitude;
 
-      if (controlRuta) {
-        map.removeControl(controlRuta);
-      }
+    const response = await fetch(`/api/paradas-cercanas/?lat=${userLat}&lon=${userLon}&radius=1500`);
+    const data = await response.json();
 
-      controlRuta = L.Routing.control({
-        waypoints: [
-          L.latLng(origen[0], origen[1]),
-          L.latLng(destino[0], destino[1])
-        ],
-        routeWhileDragging: false,
-        show: false,
-        createMarker: () => null
-      }).addTo(map);
-
-      map.setView(origen, 14);
-    },
-    (error) => {
-      console.error("Error de geolocalización:", error);
-      alert("No se pudo obtener tu ubicación.");
+    if (!data.paradas.length) {
+      alert("No se encontraron paradas cercanas.");
+      return;
     }
-  );
+
+    const parada = data.paradas[0]; // Más cercana
+    const [paradaLng, paradaLat] = parada.coordenadas;
+    const nombreParada = parada.nombre || "Parada cercana";
+
+    if (controlRuta) {
+      map.removeControl(controlRuta);
+    }
+
+    controlRuta = L.Routing.control({
+      waypoints: [
+        L.latLng(userLat, userLon),
+        L.latLng(paradaLat, paradaLng),
+        L.latLng(destinoLat, destinoLng)
+      ],
+      routeWhileDragging: false,
+      createMarker: function (i, wp) {
+        if (i === 0) {
+          return L.marker(wp.latLng, {
+            icon: L.icon({
+              iconUrl: "/static/lugares/img/yo.png",
+              iconSize: [32, 32],
+              iconAnchor: [16, 32],
+            }),
+          }).bindPopup("📍 Estás aquí");
+        } else if (i === 1) {
+          return L.marker(wp.latLng, {
+            icon: L.icon({
+              iconUrl: "/static/lugares/img/transbordo.png",
+              iconSize: [32, 32],
+              iconAnchor: [16, 32],
+            }),
+          }).bindPopup(`🚏 Transbordo en: ${nombreParada}`);
+        } else {
+          return L.marker(wp.latLng, {
+            icon: L.icon({
+              iconUrl: "/static/lugares/img/parada.png",
+              iconSize: [30, 30],
+              iconAnchor: [15, 30],
+            }),
+          }).bindPopup("🎯 Destino turístico");
+        }
+      },
+      show: false,
+    }).on("routesfound", (e) => {
+      const ruta = e.routes[0];
+      const tiempo = Math.round(ruta.summary.totalTime / 60);
+      const distancia = Math.round(ruta.summary.totalDistance);
+      alert(`🧭 Ruta estimada:\n🕒 ${tiempo} min\n📏 ${distancia} m`);
+    }).addTo(map);
+
+    map.setView([userLat, userLon], 14);
+  },
+  (error) => {
+    console.error("Error geolocalización:", error);
+    alert("No se pudo obtener tu ubicación.");
+  });
 }
 
-// Lista de sitios turísticos
+// Lista de destinos turísticos
 const zonasTuristicas = [
   { nombre: "La Candelaria", coords: [4.595, -74.074], descripcion: "Centro histórico y cultural." },
   { nombre: "Monserrate", coords: [4.605, -74.055], descripcion: "Mirador icónico de Bogotá." },
@@ -55,41 +95,38 @@ const zonasTuristicas = [
   { nombre: "Plaza de Bolívar", coords: [4.598, -74.074], descripcion: "Plaza histórica con edificios coloniales." }
 ];
 
-// Mostrar sitios turísticos en el mapa
+// Mostrar los destinos turísticos en el mapa
 zonasTuristicas.forEach(zona => {
   const [lat, lng] = zona.coords;
-
   L.marker([lat, lng])
     .addTo(map)
     .bindPopup(`
       <strong>${zona.nombre}</strong><br>
       ${zona.descripcion}<br><br>
-      <button onclick="mostrarRutaDesdeUbicacion(${lat}, ${lng})">
-        Cómo llegar desde mi ubicación
+      <button onclick="comoTransmiApp(${lat}, ${lng})">
+        🚶 Cómo llegar desde mi ubicación
       </button>
     `);
 });
 
-// Cargar paradas desde la API de Django (que consulta Transitland)
+// Mostrar paradas en el mapa
 async function cargarParadas(lat, lon) {
-  console.log("🛰️ Consultando paradas...");
   const response = await fetch(`/api/paradas-cercanas/?lat=${lat}&lon=${lon}&radius=1500`);
   const data = await response.json();
-  console.log("📦 Paradas recibidas:", data);
 
   data.paradas.forEach(parada => {
     const [lng, lat] = parada.coordenadas;
     const nombre = parada.nombre || "Parada sin nombre";
 
     L.circleMarker([lat, lng], {
-      radius: 5,
-      color: "#ff0000",
-      fillColor: "#ff6666",
-      fillOpacity: 0.9
+      radius: 6,
+      color: "#ffa500",
+      fillColor: "#ffcc00",
+      fillOpacity: 0.8
     }).addTo(map)
-      .bindPopup(`<b>${nombre}</b><br>ID: ${parada.id}`);
+      .bindPopup(`🚌 ${nombre}`);
   });
 }
 
-// Cargar paradas cercanas al centro histórico de Bogotá
+// Paradas iniciales (opcional)
 cargarParadas(4.598, -74.074);

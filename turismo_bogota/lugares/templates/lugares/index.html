@@ -3,138 +3,91 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>bogaTours - Descubre Bogotá con Seguridad</title>
+  <title>bogaTours - Estilo TransmiApp</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- Leaflet CSS y JS -->
+  <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
   <!-- Leaflet Routing Machine -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
-  <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
 
+  <!-- Estilo personalizado tipo app -->
   <style>
     body {
-      font-family: Arial, sans-serif;
       margin: 0;
-    }
-    header {
-      background: #2c3e50;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #1e1e2f;
       color: white;
-      padding: 10px;
+    }
+
+    header {
+      background: #12121f;
+      padding: 15px;
       text-align: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
     }
+
+    header h1 {
+      margin: 0;
+      font-size: 1.8rem;
+      color: #00d2ff;
+    }
+
     #bogota-map {
-      height: 600px;
+      height: 100vh;
+      width: 100%;
     }
+
+    .leaflet-popup-content {
+      font-size: 14px;
+      line-height: 1.4;
+      color: #333;
+    }
+
+    .leaflet-routing-container {
+      display: none !important; /* ocultar el panel lateral */
+    }
+
     .leaflet-control-attribution {
       display: none !important;
     }
+
+    button {
+      background-color: #00d2ff;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      margin-top: 8px;
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #00b0d6;
+    }
+
+    .leaflet-marker-icon {
+      border-radius: 50%;
+    }
   </style>
 </head>
+
 <body>
 
   <header>
-    <h1>bogaTours</h1>
-    <p>Explora sitios turísticos de Bogotá con transporte público</p>
+    <h1>🚌 bogaTours</h1>
+    <p>Inspirado en TransmiApp: ¿Cómo llegar desde tu ubicación hasta un destino turístico?</p>
   </header>
 
-  <main>
-    <div id="bogota-map"></div>
-  </main>
+  <div id="bogota-map"></div>
 
-  <script>
-    const map = L.map('bogota-map').setView([4.711, -74.0721], 13);
+  <!-- Scripts -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
 
-    // Capa base
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap'
-    }).addTo(map);
-
-    // Control de ruta actual
-    let controlRuta = null;
-
-    function mostrarRutaDesdeUbicacion(destinoLat, destinoLng) {
-      if (!navigator.geolocation) {
-        alert("Tu navegador no permite geolocalización.");
-        return;
-      }
-
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const origen = [position.coords.latitude, position.coords.longitude];
-          const destino = [destinoLat, destinoLng];
-
-          if (controlRuta) {
-            map.removeControl(controlRuta);
-          }
-
-          controlRuta = L.Routing.control({
-            waypoints: [
-              L.latLng(origen[0], origen[1]),
-              L.latLng(destino[0], destino[1])
-            ],
-            routeWhileDragging: false,
-            show: false,
-            createMarker: () => null
-          }).addTo(map);
-
-          map.setView(origen, 14);
-        },
-        (error) => {
-          console.error("Error de geolocalización:", error);
-          alert("No se pudo obtener tu ubicación.");
-        }
-      );
-    }
-
-    // Sitios turísticos
-    const zonasTuristicas = [
-      { nombre: "La Candelaria", coords: [4.595, -74.074], descripcion: "Centro histórico y cultural." },
-      { nombre: "Monserrate", coords: [4.605, -74.055], descripcion: "Mirador icónico de Bogotá." },
-      { nombre: "Museo del Oro", coords: [4.601, -74.072], descripcion: "Museo con artefactos precolombinos." },
-      { nombre: "Parque Simón Bolívar", coords: [4.658, -74.093], descripcion: "Gran parque urbano." },
-      { nombre: "Zona T", coords: [4.669, -74.052], descripcion: "Zona moderna y de vida nocturna." },
-      { nombre: "Museo Botero", coords: [4.598, -74.071], descripcion: "Obras de Botero y otros artistas." },
-      { nombre: "Plaza de Bolívar", coords: [4.598, -74.074], descripcion: "Plaza histórica con edificios coloniales." }
-    ];
-
-    zonasTuristicas.forEach(zona => {
-      const [lat, lng] = zona.coords;
-      L.marker([lat, lng])
-        .addTo(map)
-        .bindPopup(`
-          <strong>${zona.nombre}</strong><br>
-          ${zona.descripcion}<br><br>
-          <button onclick="mostrarRutaDesdeUbicacion(${lat}, ${lng})">
-            Cómo llegar desde mi ubicación
-          </button>
-        `);
-    });
-
-    // Obtener paradas desde Django y mostrarlas
-    async function cargarParadas(lat, lon) {
-      const response = await fetch(`/api/paradas-cercanas/?lat=${lat}&lon=${lon}&radius=1500`);
-      const data = await response.json();
-
-      data.paradas.forEach(parada => {
-        const [lng, lat] = parada.coordenadas;
-        const nombre = parada.nombre || "Parada sin nombre";
-
-        L.circleMarker([lat, lng], {
-          radius: 5,
-          color: "#ff0000",
-          fillColor: "#ff6666",
-          fillOpacity: 0.9
-        }).addTo(map)
-          .bindPopup(`<b>${nombre}</b><br>ID: ${parada.id}`);
-      });
-    }
-
-    // Centro histórico como referencia
-    cargarParadas(4.598, -74.074);
-  </script>
+  <!-- Tu JS personalizado -->
   <script src="{% static 'lugares/js/mapa.js' %}"></script>
 
 </body>
