@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Registro de Usuario - bogaTours</title>
+  <style>
+    body {
+      background: #1e1e2f;
+      font-family: 'Segoe UI', sans-serif;
+      color: white;
+      text-align: center;
+      padding: 50px;
+    }
+
+    form {
+      background: #2a2a40;
+      padding: 20px;
+      border-radius: 8px;
+      display: inline-block;
+    }
+
+    input {
+      display: block;
+      margin: 10px auto;
+      padding: 10px;
+      width: 250px;
+      border-radius: 5px;
+      border: none;
+    }
+
+    button {
+      background: #00d2ff;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    button:hover {
+      background: #00b0d6;
+    }
+  </style>
+</head>
+<body>
+  <h1>Registro en bogaTours</h1>
+  <form method="post">
+    {% csrf_token %}
+    <input type="text" name="username" placeholder="Nombre de usuario" required>
+    <input type="email" name="email" placeholder="Correo electrónico" required>
+    <input type="password" name="password" placeholder="Contraseña" required>
+    <button type="submit">Registrarme</button>
+  </form>
+</body>
+</html>

@@ -117,4 +117,31 @@ def vista_mapa(request):
 def inicio(request):
     return render(request, "lugares/index.html")
 
+from django.shortcuts import render, redirect
+from django.contrib.auth.models import User
+from django.contrib import messages
+
+def registro(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+
+        if not all([username, email, password]):
+            messages.error(request, 'Por favor completa todos los campos.')
+            return render(request, 'lugares/registro.html')
+
+        if User.objects.filter(username=username).exists():
+            messages.error(request, 'Este nombre de usuario ya existe.')
+        else:
+            User.objects.create_user(username=username, email=email, password=password)
+            messages.success(request, '¡Registro exitoso! Ahora puedes iniciar sesión.')
+            return redirect('login')  # Redirige al login si tienes uno
+
+    return render(request, 'lugares/registro.html')
+
+
+
+
+
 
