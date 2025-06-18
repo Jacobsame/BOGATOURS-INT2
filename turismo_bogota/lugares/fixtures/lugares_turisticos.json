@@ -1,0 +1,132 @@
+[
+  {
+    "model": "lugares.lugarturistico",
+    "pk": 11,
+    "fields": {
+      "nombre": "Telef\u00e9rico de Monserrate",
+      "descripcion": "Medio de transporte que conecta la ciudad con el santuario en la cima del cerro.",
+      "tipo": "transporte, panor\u00e1mico",
+      "ubicacion": "Estaci\u00f3n base Monserrate, Carrera 1 Este",
+      "horarios": "Lunes a s\u00e1bado: 6:30 AM - 11:30 PM",
+      "costo": "Variable seg\u00fan el d\u00eda",
+      "imagen": "url_imagen_teleferico.jpg"
+    }
+  },
+  {
+    "model": "lugares.lugarturistico",
+    "pk": 12,
+    "fields": {
+      "nombre": "Planetario de Bogot\u00e1",
+      "descripcion": "Centro cultural y astron\u00f3mico con proyecciones y exposiciones cient\u00edficas.",
+      "tipo": "educativo, ciencia, familia",
+      "ubicacion": "Calle 26B #5-93",
+      "horarios": "Martes a domingo: 10:00 AM - 5:00 PM",
+      "costo": "Acceso con entrada",
+      "imagen": "url_imagen_planetario.jpg"
+    }
+  },
+  {
+    "model": "lugares.lugarturistico",
+    "pk": 13,
+    "fields": {
+      "nombre": "Museo Nacional de Colombia",
+      "descripcion": "El museo m\u00e1s antiguo del pa\u00eds con exposiciones de arte, historia y arqueolog\u00eda.",
+      "tipo": "hist\u00f3rico, cultural, museo",
+      "ubicacion": "Carrera 7 #28-66",
+      "horarios": "Martes a domingo: 9:00 AM - 5:00 PM",
+      "costo": "Acceso gratuito algunos d\u00edas",
+      "imagen": "url_imagen_museo_nacional.jpg"
+    }
+  },
+  {
+    "model": "lugares.lugarturistico",
+    "pk": 14,
+    "fields": {
+      "nombre": "Centro Comercial Andino",
+      "descripcion": "Uno de los centros comerciales m\u00e1s exclusivos de Bogot\u00e1, ubicado en la Zona T.",
+      "tipo": "compras, ocio, gastronom\u00eda",
+      "ubicacion": "Carrera 11 #82-71",
+      "horarios": "Todos los d\u00edas: 10:00 AM - 8:00 PM",
+      "costo": "Variable seg\u00fan actividad",
+      "imagen": "url_imagen_andino.jpg"
+    }
+  },
+  {
+    "model": "lugares.lugarturistico",
+    "pk": 15,
+    "fields": {
+      "nombre": "Zona T",
+      "descripcion": "\u00c1rea popular por su vida nocturna, bares, restaurantes y tiendas de lujo.",
+      "tipo": "gastronom\u00eda, vida nocturna, entretenimiento",
+      "ubicacion": "Entre Calle 82 y Calle 84, entre Carrera 11 y Carrera 13",
+      "horarios": "Abierto (seg\u00fan locales)",
+      "costo": "Variable",
+      "imagen": "url_imagen_zona_t.jpg"
+    }
+  },
+  {
+    "model": "lugares.lugarturistico",
+    "pk": 16,
+    "fields": {
+      "nombre": "Santuario de Nuestra Se\u00f1ora del Carmen",
+      "descripcion": "Iglesia g\u00f3tica con estilo neomud\u00e9jar y una arquitectura colorida y \u00fanica.",
+      "tipo": "religioso, arquitectura, hist\u00f3rico",
+      "ubicacion": "Calle 10 #8-28",
+      "horarios": "Lunes a domingo: 7:00 AM - 6:00 PM",
+      "costo": "Gratuito",
+      "imagen": "url_imagen_carmen.jpg"
+    }
+  },
+  {
+    "model": "lugares.lugarturistico",
+    "pk": 17,
+    "fields": {
+      "nombre": "Biblioteca Virgilio Barco",
+      "descripcion": "Biblioteca p\u00fablica rodeada de jardines, lagos y espacios culturales.",
+      "tipo": "educativo, cultural, naturaleza",
+      "ubicacion": "Av. Carrera 60 #57-60",
+      "horarios": "Lunes a s\u00e1bado: 8:00 AM - 8:00 PM, Domingo: 8:00 AM - 4:00 PM",
+      "costo": "Gratuito",
+      "imagen": "url_imagen_virgilio.jpg"
+    }
+  },
+  {
+    "model": "lugares.lugarturistico",
+    "pk": 18,
+    "fields": {
+      "nombre": "Ciclov\u00eda dominical",
+      "descripcion": "Evento semanal donde se cierran v\u00edas principales para ciclistas, patinadores y peatones.",
+      "tipo": "deportivo, familia, ciudadano",
+      "ubicacion": "V\u00edas principales de Bogot\u00e1",
+      "horarios": "Domingos y festivos: 7:00 AM - 2:00 PM",
+      "costo": "Gratuito",
+      "imagen": "url_imagen_ciclovia.jpg"
+    }
+  },
+  {
+    "model": "lugares.lugarturistico",
+    "pk": 19,
+    "fields": {
+      "nombre": "Mirador La Calera",
+      "descripcion": "Punto elevado con vista panor\u00e1mica de Bogot\u00e1, ideal para tomar fotos o salir en la noche.",
+      "tipo": "panor\u00e1mico, rom\u00e1ntico, naturaleza",
+      "ubicacion": "V\u00eda a La Calera",
+      "horarios": "Abierto",
+      "costo": "Gratuito (estacionamiento y consumos opcionales)",
+      "imagen": "url_imagen_la_calera.jpg"
+    }
+  },
+  {
+    "model": "lugares.lugarturistico",
+    "pk": 20,
+    "fields": {
+      "nombre": "Chorro de Quevedo",
+      "descripcion": "Lugar tradicional del centro hist\u00f3rico con artistas callejeros, historia y cultura local.",
+      "tipo": "cultural, hist\u00f3rico, arte",
+      "ubicacion": "Calle 13 #2-98",
+      "horarios": "Abierto",
+      "costo": "Gratuito",
+      "imagen": "url_imagen_chorro.jpg"
+    }
+  }
+]

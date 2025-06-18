@@ -141,6 +141,104 @@ def registro(request):
     return render(request, 'lugares/registro.html')
 
 
+from django.http import JsonResponse
+from .models import LugarTuristico
+from django.views.decorators.csrf import csrf_exempt
+
+
+def api_inicio(request):
+    return JsonResponse({"mensaje": "Bienvenido a la API de búsqueda de lugares turísticos de Bogotá. Usa /buscar para buscar lugares."})
+
+def buscar_lugares(request):
+    query = request.GET.get("q", "").lower()
+    tipo = request.GET.get("tipo", "").lower()
+    lugares = LugarTuristico.objects.all()
+
+    resultados = []
+    for lugar in lugares:
+        tipos = [t.strip().lower() for t in lugar.tipo.split(",")]
+        if (not query or query in lugar.nombre.lower() or query in lugar.descripcion.lower()) and (not tipo or tipo in tipos):
+            resultados.append({
+                "id": lugar.id,
+                "nombre": lugar.nombre,
+                "descripcion": lugar.descripcion,
+                "tipo": tipos,
+                "ubicacion": lugar.ubicacion,
+                "horarios": lugar.horarios,
+                "costo": lugar.costo,
+                "imagen": lugar.imagen
+            })
+
+    return JsonResponse(resultados, safe=False)
+
+def obtener_lugar_por_id(request, lugar_id):
+    try:
+        lugar = LugarTuristico.objects.get(pk=lugar_id)
+        return JsonResponse({
+            "id": lugar.id,
+            "nombre": lugar.nombre,
+            "descripcion": lugar.descripcion,
+            "tipo": lugar.tipo,
+            "ubicacion": lugar.ubicacion,
+            "horarios": lugar.horarios,
+            "costo": lugar.costo,
+            "imagen": lugar.imagen
+        })
+    except LugarTuristico.DoesNotExist:
+        return JsonResponse({"error": "Lugar no encontrado"}, status=404)
+
+from django.shortcuts import render
+from .models import LugarTuristico
+
+def lugares_turisticos(request):
+    lugares = LugarTuristico.objects.all()
+    return render(request, 'lugares/lugares_turisticos.html', {'lugares': lugares})
+
+from django.shortcuts import render, get_object_or_404
+from django.http import JsonResponse
+from .models import Sitio, Reseña
+
+def index(request):
+    sitios = Sitio.objects.all()
+    return render(request, 'lugares/index.html', {"sitios": sitios})
+
+def detalles_sitio(request, sitio_id):
+    sitio = get_object_or_404(Sitio, id=sitio_id)
+    reseñas = sitio.resenas.order_by('-fecha').values("nombre_usuario", "comentario", "calificacion", "fecha")
+    data = {
+        "nombre": sitio.nombre,
+        "descripcion": sitio.descripcion,
+        "latitud": sitio.latitud,
+        "longitud": sitio.longitud,
+        "reseñas": list(reseñas)
+    }
+    return JsonResponse(data)
+
+def buscar_lugar(request):
+    query = request.GET.get("q", "").strip().lower()
+    sitio = Sitio.objects.filter(nombre__icontains=query).first()
+
+    if not sitio:
+        return JsonResponse({"error": "Lugar no encontrado"}, status=404)
+
+    return JsonResponse({"id": sitio.id})
+
+from django.views.decorators.csrf import csrf_exempt
+import json
+from django.views.decorators.http import require_POST
+
+@csrf_exempt
+@require_POST
+def enviar_resena(request):
+    data = json.loads(request.body)
+    sitio = get_object_or_404(Sitio, id=data["sitio_id"])
+    Reseña.objects.create(
+        sitio=sitio,
+        nombre_usuario=data["nombre_usuario"],
+        comentario=data["comentario"],
+        calificacion=data["calificacion"]
+    )
+    return JsonResponse({"ok": True})
 
 
 

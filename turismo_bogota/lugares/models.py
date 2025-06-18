@@ -1,4 +1,6 @@
 from django.db import models
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes.fields import GenericForeignKey
 
 # Sitio turístico
 class Sitio(models.Model):
@@ -10,7 +12,6 @@ class Sitio(models.Model):
     def __str__(self):
         return self.nombre
 
-# Parada de transporte (opcional si guardas paradas localmente)
 class ParadaTransporte(models.Model):
     nombre = models.CharField(max_length=100, blank=True, null=True)
     onestop_id = models.CharField(max_length=100, unique=True)
@@ -20,7 +21,6 @@ class ParadaTransporte(models.Model):
     def __str__(self):
         return self.nombre or self.onestop_id
 
-# Ruta sugerida desde una parada hasta un sitio
 class RutaSitio(models.Model):
     sitio = models.ForeignKey(Sitio, on_delete=models.CASCADE)
     parada_origen = models.ForeignKey(ParadaTransporte, on_delete=models.CASCADE)
@@ -30,13 +30,29 @@ class RutaSitio(models.Model):
     def __str__(self):
         return f"{self.parada_origen} → {self.sitio}"
 
-# Reseñas de los sitios
+class LugarTuristico(models.Model):
+    nombre = models.CharField(max_length=200)
+    descripcion = models.TextField()
+    tipo = models.CharField(max_length=255)
+    ubicacion = models.CharField(max_length=255)
+    horarios = models.CharField(max_length=255)
+    costo = models.CharField(max_length=100)
+    imagen = models.URLField()
+
+    def __str__(self):
+        return self.nombre
+
+# Reseñas genéricas (pueden ser para Sitio o LugarTuristico)
 class Reseña(models.Model):
-    sitio = models.ForeignKey(Sitio, on_delete=models.CASCADE, related_name='resenas')
     nombre_usuario = models.CharField(max_length=50)
     comentario = models.TextField()
     calificacion = models.IntegerField(choices=[(i, i) for i in range(1, 6)])
     fecha = models.DateTimeField(auto_now_add=True)
 
+    # Relación genérica
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    contenido_objeto = GenericForeignKey("content_type", "object_id")
+
     def __str__(self):
-        return f"{self.nombre_usuario} - {self.sitio.nombre}"
+        return f"{self.nombre_usuario} - {self.content_type} ({self.object_id})"

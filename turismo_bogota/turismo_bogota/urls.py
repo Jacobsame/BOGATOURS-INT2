@@ -8,6 +8,7 @@ urlpatterns = [
     path('paradas-cercanas/', views.paradas_cercanas, name='paradas_cercanas'),  # Esta ruta extra si la necesitas aparte
     path("admin/", admin.site.urls),
     path("", include("lugares.urls")),
+    path('', include('lugares.urls')), 
 ]
 
 

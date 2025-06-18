@@ -2,74 +2,143 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>bogaTours - Estilo TransmiApp</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>bogaTours - Descubre Bogotá con Seguridad</title>
 
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-
-  <!-- Leaflet Routing Machine -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
 
-  <!-- Estilo personalizado tipo app -->
+  <!-- Estilos embebidos -->
   <style>
     body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
-      background-color: #1e1e2f;
-      color: white;
+      background-color: #f8f8f8;
+      color: #333;
     }
 
     header {
       background: #12121f;
-      padding: 15px;
+      color: #fff;
+      padding: 20px;
       text-align: center;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
     }
 
     header h1 {
       margin: 0;
-      font-size: 1.8rem;
+      font-size: 2rem;
       color: #00d2ff;
     }
 
+    nav ul {
+      list-style: none;
+      padding: 0;
+      margin: 10px 0 0;
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    nav ul li a {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
     #bogota-map {
-      height: 100vh;
+      height: 500px;
       width: 100%;
+      border-radius: 10px;
+      margin-top: 20px;
     }
 
-    .leaflet-popup-content {
-      font-size: 14px;
-      line-height: 1.4;
-      color: #333;
+    .section-padding {
+      padding: 40px 20px;
+      text-align: center;
     }
 
-    .leaflet-routing-container {
-      display: none !important; /* ocultar el panel lateral */
+    .tour-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .tour-card {
+      background: #fff;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .tour-card img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+
+    .btn-reserve, .btn-secondary {
+      background-color: #00d2ff;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      margin-top: 15px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    footer {
+      background-color: #12121f;
+      color: white;
+      padding: 20px;
+      text-align: center;
     }
 
     .leaflet-control-attribution {
       display: none !important;
     }
 
-    button {
-      background-color: #00d2ff;
-      color: white;
-      border: none;
-      padding: 8px 12px;
-      margin-top: 8px;
-      border-radius: 6px;
-      font-size: 14px;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background-color: #00b0d6;
-    }
-
-    .leaflet-marker-icon {
+    .bus-stop-icon {
+      background-color: red;
       border-radius: 50%;
+      width: 12px;
+      height: 12px;
+      display: block;
+      border: 2px solid white;
+    }
+
+    #busqueda-input {
+      padding: 8px;
+      width: 250px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    #detalles-lugar {
+      background-color: #f4f4f4;
+      padding: 30px;
+      margin: 20px;
+      border-radius: 10px;
+      text-align: left;
+    }
+
+    #detalles-lugar h2 {
+      margin-top: 0;
+    }
+
+    #detalles-lugar textarea,
+    #detalles-lugar input,
+    #detalles-lugar select {
+      margin-top: 8px;
+      width: 100%;
+      padding: 6px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      margin-bottom: 12px;
     }
   </style>
 </head>
@@ -77,18 +146,93 @@
 <body>
 
   <header>
-    <h1>🚌 bogaTours</h1>
-    <p>Inspirado en TransmiApp: ¿Cómo llegar desde tu ubicación hasta un destino turístico?</p>
+    <h1>bogaTours</h1>
+    <p>Explora Bogotá con Seguridad</p>
+    <nav>
+      <ul>
+        <li><a href="#">Inicio</a></li>
+        <li><a href="#tours">Nuestros Tours</a></li>
+        <li><a href="#mapa">Mapa Interactivo</a></li>
+        <li><a href="#contacto">Contacto</a></li>
+      </ul>
+    </nav>
   </header>
 
-  <div id="bogota-map"></div>
+  <section id="hero" class="section-padding">
+    <h2>Bogotá Te Espera, Explora con Confianza.</h2>
+    <p>Descubre la magia de la capital colombiana con nuestros tours personalizados y guías expertos.</p>
+    <button class="btn-reserve">¡Reserva tu Aventura!</button>
+  </section>
+
+  <!-- Buscador -->
+  <section style="padding: 20px; text-align: center;">
+    <input type="text" id="busqueda-input" placeholder="Buscar lugar turístico..." />
+    <button onclick="buscarLugar()">Buscar</button>
+  </section>
+
+  <!-- Mapa -->
+  <section id="mapa" class="section-padding">
+    <h2>Mapa Interactivo de Bogotá</h2>
+    <p>Descubre las zonas turísticas y planifica tu aventura.</p>
+    <div id="bogota-map"></div>
+  </section>
+
+  <!-- Detalles del lugar (bajo el mapa) -->
+  <section id="detalles-lugar" style="display:none;">
+    <h2 id="detalle-nombre"></h2>
+    <p id="detalle-descripcion"></p>
+    <div>
+      <h3>📝 Reseñas</h3>
+      <ul id="detalle-reseñas"></ul>
+    </div>
+    <form onsubmit="return enviarReseña();">
+      <h4>Agregar reseña</h4>
+      <input type="text" id="nombre_usuario" placeholder="Tu nombre" required />
+      <select id="calificacion">
+        <option value="5">⭐️⭐️⭐️⭐️⭐️</option>
+        <option value="4">⭐️⭐️⭐️⭐️</option>
+        <option value="3">⭐️⭐️⭐️</option>
+        <option value="2">⭐️⭐️</option>
+        <option value="1">⭐️</option>
+      </select><br />
+      <textarea id="comentario" placeholder="Escribe tu opinión..." required></textarea><br>
+      <button type="submit">Enviar reseña</button>
+    </form>
+  </section>
+
+  <!-- Tours -->
+  <section id="tours" class="section-padding">
+    <h2>Tours Recomendados</h2>
+    <div class="tour-cards">
+      <div class="tour-card">
+        <img src="{% static 'img/monserrate.jpg' %}" alt="Monserrate">
+        <h3>Monserrate</h3>
+        <p>Sube al cerro más icónico de Bogotá y contempla la ciudad desde lo alto.</p>
+        <button onclick="mostrarDetallesDesdeID(1)" class="btn-secondary">Más detalles</button>
+      </div>
+      <div class="tour-card">
+        <img src="{% static 'img/candelaria.jpg' %}" alt="La Candelaria">
+        <h3>La Candelaria</h3>
+        <p>Explora el corazón colonial y cultural de la ciudad.</p>
+        <button onclick="mostrarDetallesDesdeID(2)" class="btn-secondary">Más detalles</button>
+      </div>
+      <div class="tour-card">
+        <img src="{% static 'img/botero.jpg' %}" alt="Museo Botero">
+        <h3>Museo Botero</h3>
+        <p>Obras de arte del maestro Fernando Botero y otros artistas latinoamericanos.</p>
+        <button onclick="mostrarDetallesDesdeID(3)" class="btn-secondary">Más detalles</button>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>📍 Bogotá, Colombia | Tel: +57 3053128525 | Email: info@bogatours.com</p>
+    <p>&copy; 2025 bogaTours - Todos los derechos reservados</p>
+  </footer>
 
   <!-- Scripts -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
-
-  <!-- Tu JS personalizado -->
-  <script src="{% static 'lugares/js/mapa.js' %}"></script>
-
+  <script src="{% static 'lugares/js/mapa.js' %}" defer></script>
 </body>
 </html>
