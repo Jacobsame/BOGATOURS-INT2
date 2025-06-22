@@ -54,23 +54,26 @@ PyQt6-Qt6
 requests
 SQLAlchemy
 Werkzeug```
-
+```
 Para instalar todas las dependencias, usa:
 ```
 pip install -r requirements.txt
 
 ```
-🚀 Instalación y Configuración
 
+
+
+🚀 Instalación y Configuración
 🔹 Clonar el Proyecto
 ```
 git clone https://github.com/Jacobsame/BOGATOURS-INT2.git
 cd BOGATOURS-INT2
-```
 
+```
 
 🔹 Configurar el Entorno Virtual
 ```
+
 python -m venv env
 source env/Scripts/activate  # En Windows
 source env/bin/activate      # En Linux/MacOS
@@ -98,11 +101,11 @@ python manage.py migrate
 bash
 python manage.py runserver
 ```
-Accede a la aplicación en http://127.0.0.1:8000/.
+Accede a la aplicación en: ```http://127.0.0.1:8000/```.
 
 📂 Estructura del Proyecto
 
-
+```
 /BOGATOURS-INT2
 ├── app/               # Contiene el punto de entrada de la aplicación
 │   ├── main.py        # Archivo principal que ejecuta la lógica central
@@ -139,6 +142,7 @@ Accede a la aplicación en http://127.0.0.1:8000/.
 │   │   └── tests.py     # Pruebas unitarias del módulo
 ├── requirements.txt   # Listado de dependencias necesarias
 └── DOCUMENTACION.md   # Documentación detallada del proyecto
+```
 
 📖 Uso de la Aplicación
 Accede al servidor local: Ingresa a ```http://127.0.0.1:8000/``` en el navegador.
